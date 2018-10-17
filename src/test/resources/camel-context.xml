@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/spring"
+	xsi:schemaLocation="
+          http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<camelContext id="ebusCamel" xmlns="http://camel.apache.org/schema/spring" autoStartup="true">
+		<template id="ebusProducer" camelContextId="ebusCamel" />
+
+		<route>
+			<from uri="direct:ebus.web.api.line" />
+			<setHeader headerName="CamelHttpMethod">
+				<constant>POST</constant>
+			</setHeader>
+			<setHeader headerName="Content-Type">
+				<constant>application/x-www-form-urlencoded</constant>
+			</setHeader>
+			<setBody>
+				<simple>${in.body}</simple>
+			</setBody>
+			<to uri="http4://slb.szebus.net/bc/phone/data?httpClient.socketTimeout=60000" />
+		</route>
+		<route>
+			<from uri="direct:ebus.web.api.detail" />
+			<setHeader headerName="CamelHttpMethod">
+				<constant>POST</constant>
+			</setHeader>
+			<setHeader headerName="Content-Type">
+				<constant>application/x-www-form-urlencoded</constant>
+			</setHeader>
+			<setBody>
+				<simple>${in.body}</simple>
+			</setBody>
+			<to uri="http4://slb.szebus.net/line/phone/detail?httpClient.socketTimeout=60000" />
+		</route>
+	</camelContext>
+</beans>
